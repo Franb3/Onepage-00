@@ -1,0 +1,102 @@
+/* ========================================================================
+   hero.css — Carrusel de portada (imágenes a pantalla completa)
+   Componente: src/components/Hero.astro
+   ======================================================================== */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  /* ? "svh" descuenta la barra del navegador en móviles; si no existe, se queda el 100vh de arriba */
+  height: 100svh;
+  overflow: hidden;
+  background: #9fb6cd; /* * Color visible mientras carga la primera imagen */
+}
+
+/* ===== Pista del carrusel ===== */
+/* * Usa "scroll snap": en el móvil se desliza con el dedo y cada imagen queda encajada */
+.hero__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* ? Desplazamiento fluido en iOS antiguos */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* * Oculta la barra de desplazamiento horizontal en Chrome y Safari */
+.hero__track::-webkit-scrollbar {
+  display: none;
+}
+
+.hero__slide {
+  flex: 0 0 100%; /* ! Cada diapositiva ocupa exactamente el 100 % del ancho: el código JS lo da por hecho */
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.hero__slide picture {
+  width: 100%;
+  height: 100%;
+}
+
+.hero__slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* * Rellena todo el espacio recortando lo que sobre */
+}
+
+/* ===== Flechas anterior / siguiente ===== */
+.hero__btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(176, 176, 176, 0.8);
+  color: #fafafa;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.hero__btn--prev {
+  left: 15px;
+}
+
+.hero__btn--next {
+  right: 15px;
+}
+
+.hero__btn:hover {
+  background-color: #598fc6;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ===== Móvil ===== */
+@media (max-width: 768px) {
+  .hero {
+    height: 60vh;
+    height: 60svh;
+    min-height: 300px;
+  }
+
+  .hero__btn--prev {
+    left: 10px;
+  }
+
+  .hero__btn--next {
+    right: 10px;
+  }
+}

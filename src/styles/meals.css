@@ -1,0 +1,126 @@
+/* ========================================================================
+   meals.css — Sección "Gastronomía" (desayuno, almuerzo, merienda, cena)
+   Componente: src/components/Meals.astro
+   Datos (horarios y descripciones): src/config/site.ts
+   ======================================================================== */
+
+.meals {
+  background: var(--meals-bg);
+  padding: 3.5rem 2rem;
+  text-align: center;
+  transition: background-color 0.5s ease;
+}
+
+.meals__title {
+  font-size: 2rem;
+  color: var(--heading);
+  margin: 0 0 0.75rem;
+}
+
+.meals__intro {
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--meal-text);
+}
+
+/* ===== Cuadrícula de tarjetas ===== */
+/* * 4 columnas en escritorio, 2 en tablet y 1 en móvil */
+.meals__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* ? minmax(0, 1fr) evita que el texto largo ensanche una columna */
+  grid-gap: 1.5rem;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 1100px;
+}
+
+/* ===== Tarjeta ===== */
+.meals__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.25rem 1.75rem;
+  background: var(--meal-card-bg);
+  border-radius: 12px;
+  box-shadow: var(--meal-card-shadow);
+  transition: transform 0.25s ease, background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* ? La tarjeta solo "sube" en dispositivos con ratón (en táctiles se quedaría pegada) */
+@media (hover: hover) {
+  .meals__card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* * Círculo con el ícono */
+.meals__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: var(--meal-icon-bg);
+  color: var(--meal-icon);
+}
+
+.meals__name {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--heading);
+}
+
+/* * Horario con un pequeño reloj */
+.meals__time {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+  color: var(--meal-time);
+}
+
+.meals__time svg {
+  margin-right: 0.4rem;
+}
+
+.meals__text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--meal-text);
+}
+
+/* ===== Tablet: 2 columnas ===== */
+@media (max-width: 1000px) {
+  .meals__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ===== Móvil: 1 columna ===== */
+@media (max-width: 560px) {
+  .meals {
+    padding: 2.5rem 1rem;
+  }
+
+  .meals__title {
+    font-size: 1.7rem;
+  }
+
+  .meals__intro {
+    font-size: 1.05rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .meals__grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 420px;
+  }
+}

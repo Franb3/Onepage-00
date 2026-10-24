@@ -1,0 +1,39 @@
+/* ========================================================================
+   about.css — Sección "Sobre nosotros"
+   Componente: src/components/About.astro
+   ======================================================================== */
+
+.about {
+  background: var(--about-bg);
+  color: var(--about-text);
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: background-color 0.5s ease;
+}
+
+.about__title {
+  font-size: 2rem;
+  margin: 0 0 1rem;
+}
+
+.about__text {
+  font-size: 1.2rem;
+  max-width: 800px; /* * Limita el ancho para que las líneas largas sean cómodas de leer */
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ===== Móvil ===== */
+@media (max-width: 480px) {
+  .about {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .about__title {
+    font-size: 1.7rem;
+  }
+
+  .about__text {
+    font-size: 1.05rem;
+  }
+}

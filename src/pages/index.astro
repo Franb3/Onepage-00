@@ -1,0 +1,33 @@
+---
+// ========================================================================
+// index.astro — Página principal (une todas las secciones en orden)
+// ------------------------------------------------------------------------
+// ! El id de cada sección debe coincidir con los enlaces del menú
+// ! (src/config/site.ts, variable "nav").
+// ========================================================================
+import Layout from "../layouts/Layout.astro";
+import Snow from "../components/Snow.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/Hero.astro";
+import Gallery from "../components/Gallery.astro";
+import About from "../components/About.astro";
+import Meals from "../components/Meals.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout>
+  {/* * Enlace invisible para quien navega con teclado o lector de pantalla: salta directo al contenido */}
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <Snow />
+  <Nav />
+  <main id="main">
+    {/* * Orden de las secciones: para reordenarlas, mover estas líneas y el menú en site.ts */}
+    <Hero />
+    <Gallery />
+    <About />
+    <Meals />
+    <Contact />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,27 @@
+---
+// ========================================================================
+// Footer.astro — Pie de página con redes sociales
+// ------------------------------------------------------------------------
+// * Estilos: src/styles/footer.css
+// * Texto y redes: se editan en src/config/site.ts ("site" y "social")
+// ========================================================================
+import "../styles/footer.css";
+import Icon from "./Icon.astro";
+import { site, social } from "../config/site";
+---
+
+<footer class="footer">
+  <p class="footer__text">{site.footerText}</p>
+
+  <ul class="footer__social" aria-label="Redes sociales">
+    {social.map((item) => (
+      <li>
+        {/* * rel="noopener noreferrer": evita que la página abierta pueda controlar esta pestaña */}
+        {/* ? aria-label: como el enlace solo tiene un ícono, este texto es lo que leen los lectores de pantalla */}
+        <a href={item.href} target="_blank" rel="noopener noreferrer" aria-label={item.name} title={item.name}>
+          <Icon name={item.icon} size={24} />
+        </a>
+      </li>
+    ))}
+  </ul>
+</footer>

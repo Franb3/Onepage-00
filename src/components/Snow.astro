@@ -1,0 +1,41 @@
+---
+// ========================================================================
+// Snow.astro — Copos de nieve cayendo
+// ------------------------------------------------------------------------
+// * Se genera con CSS puro: suave en móviles y no recalcula
+// * el diseño de la página.
+// * Estilos y animaciones: src/styles/snow.css
+// ? Los valores aleatorios se calculan al compilar el sitio, así que la nieve
+// ? es la misma en cada visita (no cambia al recargar).
+// ========================================================================
+import "../styles/snow.css";
+
+const COUNT = 60; // * Cantidad de copos (en teléfonos, snow.css muestra solo los primeros 25)
+const colors = ["#aaaacc", "#ddddff", "#ccccdd"]; 
+const rand = (min: number, max: number) => Math.random() * (max - min) + min;
+
+// * Crea los datos de cada copo: posición, tamaño, velocidad y vaivén
+const flakes = Array.from({ length: COUNT }, () => {
+  const fall = rand(9, 20);
+  return {
+    left: rand(0, 100).toFixed(1),
+    size: Math.round(rand(8, 20)),
+    fall: fall.toFixed(1),
+    // ? Retraso negativo: el copo "ya lleva tiempo cayendo" cuando carga la página, no empiezan todos arriba a la vez
+    delay: (-rand(0, fall)).toFixed(1),
+    sway: Math.round(rand(8, 30)),
+    swayTime: rand(3, 6).toFixed(1),
+    color: colors[Math.floor(Math.random() * colors.length)],
+  };
+});
+---
+
+{/* ! aria-hidden: la nieve es solo decorativa, los lectores de pantalla deben ignorarla */}
+<div class="snow" aria-hidden="true">
+  {flakes.map((f) => (
+    <span
+      class="flake"
+      style={`--l:${f.left}%;--s:${f.size}px;--d:${f.fall}s;--w:${f.delay}s;--x:${f.sway}px;--t:${f.swayTime}s;color:${f.color}`}
+    ></span>
+  ))}
+</div>

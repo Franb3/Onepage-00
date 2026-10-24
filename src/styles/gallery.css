@@ -1,0 +1,60 @@
+/* ========================================================================
+   gallery.css — Galería de fotos en cuadrícula
+   Componente: src/components/Gallery.astro
+   ======================================================================== */
+
+.gallery {
+  display: grid;
+  /* * Tantas columnas como quepan, cada una de 300 px como mínimo */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 2em; /* ? "grid-gap" es el nombre antiguo; se deja junto a "gap" para navegadores viejos */
+  gap: 2em;
+  padding: 2em;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  /* ! Esto + "pointer-events: auto" en las fotos hace que el atenuado solo ocurra sobre una foto, no en los espacios */
+  pointer-events: none;
+}
+
+.gallery picture {
+  pointer-events: auto;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 0.25em;
+  background: #d5dbe3; /* * Color de relleno mientras carga cada foto */
+  transition: transform 250ms ease-in-out, filter 250ms ease-in-out;
+}
+
+/* ===== Efecto al pasar el ratón ===== */
+/* ? Solo en dispositivos con ratón: en pantallas táctiles el "hover" se queda pegado después de tocar */
+@media (hover: hover) {
+  .gallery img:hover {
+    transform: scale(1.05);
+  }
+
+  /* * Mientras el ratón está sobre la galería, las demás fotos se apagan */
+  .gallery:hover picture:not(:hover) img {
+    filter: saturate(0.2) opacity(0.5);
+  }
+}
+
+/* ===== Móvil: una columna ===== */
+/* ! Con menos de 680 px la regla minmax(300px) de arriba desbordaría la pantalla (el original tenía este error) */
+@media (max-width: 680px) {
+  .gallery {
+    grid-template-columns: 100%;
+    grid-gap: 1em;
+    gap: 1em;
+    padding: 1em;
+  }
+
+  .gallery img {
+    height: 240px;
+  }
+}

@@ -1,0 +1,47 @@
+/* ========================================================================
+   footer.css — Pie de página con redes sociales
+   Componente: src/components/Footer.astro
+   ======================================================================== */
+
+.footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  text-align: center;
+  padding: 1rem;
+  /* * Deja espacio para la barra inferior de iPhone (la que se desliza para volver al inicio) */
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.footer__text {
+  margin: 0 0 0.5rem;
+}
+
+/* ===== Íconos de redes sociales ===== */
+.footer__social {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer__social li {
+  margin: 0 4px;
+}
+
+.footer__social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* * Zona táctil de 44 px aunque el ícono mida 24 px */
+  height: 44px;
+  color: var(--social);
+  transition: color 0.3s, transform 0.3s;
+}
+
+.footer__social a:hover {
+  color: var(--social-hover);
+  transform: scale(1.12);
+}

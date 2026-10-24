@@ -1,0 +1,75 @@
+/* ========================================================================
+   snow.css — Copos de nieve cayendo (solo CSS, sin JavaScript)
+   Componente: src/components/Snow.astro
+   Cada copo recibe sus valores desde Snow.astro mediante variables CSS:
+     --l posición horizontal · --s tamaño · --d duración de la caída
+     --w retraso · --x amplitud del vaivén · --t duración del vaivén
+   ======================================================================== */
+
+/* * Capa fija que cubre toda la pantalla; los copos caen dentro de ella */
+.snow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* ! Imprescindible: sin esto la nieve bloquearía los clics en toda la página */
+  z-index: 900; /* ? Sobre el contenido pero bajo el menú (z-index 1000) */
+}
+
+.flake {
+  position: absolute;
+  top: -30px;
+  left: var(--l);
+  font-size: var(--s);
+  line-height: 1;
+  /* * Caída vertical constante */
+  animation: fall var(--d) linear var(--w) infinite;
+}
+
+/* * El copo (❅) se dibuja en un pseudo-elemento para poder animar el vaivén por separado */
+.flake::before {
+  content: "\2745";
+  display: block;
+  animation: sway var(--t) ease-in-out var(--w) infinite alternate;
+}
+
+/* ? Se animan solo "transform": es lo más liviano para el teléfono, no recalcula el diseño de la página */
+@keyframes fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 110vh, 0);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: translateX(calc(var(--x) * -1));
+  }
+  to {
+    transform: translateX(var(--x));
+  }
+}
+
+/* ===== Teléfonos: menos copos y sin vaivén ===== */
+/* * Cuida la batería y evita tirones en equipos antiguos */
+@media (max-width: 600px) {
+  .flake:nth-child(n + 26) {
+    display: none;
+  }
+
+  .flake::before {
+    animation: none;
+  }
+}
+
+/* ===== Accesibilidad ===== */
+/* * Quien pidió "reducir movimiento" en su sistema no ve la nieve */
+@media (prefers-reduced-motion: reduce) {
+  .snow {
+    display: none;
+  }
+}

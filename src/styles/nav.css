@@ -1,0 +1,212 @@
+/* ========================================================================
+   nav.css — Menú de navegación fijo (logo, enlaces, modo oscuro, móvil)
+   Componente: src/components/Nav.astro
+   ======================================================================== */
+
+/* ===== Contenedor del menú ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* ! Debe quedar por encima de la nieve (z-index 900) */
+  background: var(--nav-bg);
+  padding: 1rem;
+  /* ? max() respeta la "muesca" de iPhone en horizontal; el valor anterior es el respaldo */
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-top: max(1rem, env(safe-area-inset-top));
+  transition: background 0.3s ease-in-out;
+}
+
+.nav__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  position: relative; /* * Referencia para el menú desplegable en móvil */
+}
+
+/* ===== Logo ===== */
+.nav__logo {
+  display: block;
+  line-height: 0;
+}
+
+.nav__logo img {
+  height: 50px;
+  width: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav__logo:hover img {
+  transform: scale(1.1);
+}
+
+/* ===== Lista de enlaces ===== */
+.nav__list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ? Se usa margin y no "gap": los iPhone con iOS 14.0 o anterior no soportan gap en flexbox */
+.nav__list li {
+  margin: 0 15px;
+}
+
+.nav__list li:last-child {
+  margin-right: 0;
+}
+
+.nav__list a {
+  color: var(--nav-link);
+  text-decoration: none;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav__list a:hover {
+  color: var(--nav-link-hover);
+}
+
+/* ===== Botón de hamburguesa (solo se ve en móvil) ===== */
+.nav__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px; /* * 44 px es el tamaño mínimo recomendado para tocar con el dedo */
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--nav-toggle);
+  cursor: pointer;
+}
+
+.nav__toggle span {
+  line-height: 0;
+}
+
+/* * Muestra el ícono de "cerrar" (X) cuando el menú está abierto */
+.nav__toggle-close,
+.nav__toggle[aria-expanded="true"] .nav__toggle-open {
+  display: none;
+}
+
+.nav__toggle[aria-expanded="true"] .nav__toggle-close {
+  display: inline-flex;
+}
+
+/* ===== Botón de modo oscuro (luna / sol) ===== */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--nav-link);
+  transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* * Los dos íconos están superpuestos; se cambia cuál es visible con la opacidad */
+.theme-toggle span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  line-height: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.theme-toggle__moon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.theme-toggle__sun {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
+[data-theme="dark"] .theme-toggle__moon {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+}
+
+[data-theme="dark"] .theme-toggle__sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ===== Móvil y tablet pequeña (768 px o menos) ===== */
+@media (max-width: 768px) {
+  .nav {
+    padding-top: max(0.6rem, env(safe-area-inset-top));
+    padding-bottom: 0.6rem;
+  }
+
+  .nav__logo img {
+    height: 44px;
+  }
+
+  /* ! Estas reglas dependen de la clase "js" que añade Layout.astro: sin JavaScript el menú queda siempre visible */
+  .js .nav__toggle {
+    display: inline-flex;
+  }
+
+  /* * Menú desplegable: oculto por defecto, aparece al añadir la clase "is-open" (ver Nav.astro) */
+  .js .nav__list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -1rem;
+    right: -1rem;
+    margin-top: 0.6rem;
+    padding: 0.75rem 0;
+    flex-direction: column;
+    background: var(--nav-bg);
+    box-shadow: 0 10px 16px rgba(0, 0, 0, 0.18);
+    text-align: center;
+  }
+
+  .js .nav__list.is-open {
+    display: flex;
+  }
+
+  .nav__list li {
+    margin: 0.2rem 0;
+  }
+
+  /* * Enlaces con zona táctil de al menos 44 px */
+  .nav__list li a {
+    display: inline-block;
+    min-width: 44px;
+    min-height: 44px;
+    line-height: 44px;
+    padding: 0 1rem;
+  }
+
+  /* ? Sin JavaScript: los enlaces se muestran en fila y el botón de tema (que no funcionaría) se oculta */
+  html:not(.js) .nav__list {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  html:not(.js) .nav__list li {
+    margin: 0 0.4rem;
+  }
+
+  html:not(.js) .theme-toggle {
+    display: none;
+  }
+}

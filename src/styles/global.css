@@ -1,0 +1,183 @@
+/* ========================================================================
+   global.css — Variables de color (tema claro/oscuro) y estilos base
+   ------------------------------------------------------------------------
+   Cada componente tiene su propio archivo .css en esta carpeta:
+   nav, hero, gallery, about, meals, contact, footer, snow y error-404.
+   ======================================================================== */
+
+/* * GUÍA DE COMENTARIOS (extensión "Better Comments" de VS Code) */
+/* * Morado: explica qué hace un bloque de código */
+/* ! Rojo: advertencia, no lo cambies sin leer el motivo */
+/* ? Azul: aclara el porqué de una decisión */
+/* TODO: idea o tarea pendiente */
+
+/* ===== Colores del tema CLARO (los del diseño original) ===== */
+:root {
+  color-scheme: light;
+
+  /* * Fondo y texto general */
+  --bg: #f0f0f0;
+  --text: #b0b0b0;
+
+  /* * Menú de navegación */
+  --nav-bg: #fafafa;
+  --nav-link: #b0b0b0;
+  --nav-link-hover: #598fc6;
+  --nav-toggle: #598fc6;
+
+  /* * Sección "Sobre nosotros" */
+  --about-bg: #598fc6;
+  --about-text: #fafafa;
+
+  /* * Sección "Gastronomía" (colores nuevos, mismos tonos azules del sitio) */
+  --meals-bg: #e6eef7;
+  --meal-card-bg: #fff;
+  --meal-card-shadow: 0 4px 10px rgba(55, 102, 164, 0.15);
+  --meal-icon-bg: #598fc6;
+  --meal-icon: #fff;
+  --meal-time: #3766a4;
+  --meal-text: #6b6b6b; /* ? Más oscuro que --text para que se lea bien sobre blanco */
+
+  /* * Sección "Contacto" y formulario */
+  --contact-bg: #f0f0f0;
+  --heading: #598fc6;
+  --label: #598fc6;
+  --card-bg: #fff;
+  --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  --input-bg: #fff;
+  --input-text: #222;
+  --input-border: #ccc;
+  --btn-bg: #3766a4;
+  --btn-bg-hover: #598fc6;
+  --ok: #2e7d32;
+  --error: #c62828;
+
+  /* * Pie de página y redes sociales */
+  --footer-bg: #fafafa;
+  --footer-text: #b0b0b0;
+  --social: #679eff;
+  --social-hover: #005cfa;
+}
+
+/* ===== Colores del tema OSCURO ===== */
+/* ! Solo se redefine lo que cambia: el resto se hereda del tema claro */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #222;
+  --text: #f5f5f5;
+
+  --nav-bg: #030303;
+  --nav-link: #b0b0b0;
+  --nav-toggle: #e8e8e8;
+
+  --about-bg: #002142;
+
+  --meals-bg: #17212b;
+  --meal-card-bg: #292929;
+  --meal-card-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  --meal-icon-bg: #3766a4;
+  --meal-time: #c3c3c3;
+  --meal-text: #d0d0d0;
+
+  --contact-bg: #222;
+  --heading: #c3c3c3;
+  --label: #c3c3c3;
+  --card-bg: #292929;
+  --card-shadow: 0 4px 8px rgba(199, 199, 199, 0.2);
+  --input-bg: #222;
+  --input-text: #f5f5f5;
+  --ok: #81c784;
+  --error: #ef9a9a;
+
+  --footer-bg: #292929;
+  --footer-text: #fff;
+}
+
+/* ===== Base ===== */
+*,
+*::before,
+*::after {
+  /* * El ancho incluye padding y borde: evita que las cajas se salgan de la pantalla */
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* * El menú es fijo: este margen evita que tape los títulos al navegar con los enlaces */
+  scroll-padding-top: 5.5rem;
+}
+
+/* ? Solo hay desplazamiento suave si la persona no pidió reducir el movimiento */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: "Concert One", "Trebuchet MS", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+  /* * Transición suave al cambiar entre modo claro y oscuro */
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+picture {
+  display: block;
+}
+
+/* ? Los botones y campos no heredan la fuente por defecto; esto los iguala al resto del sitio */
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  /* * Contorno visible al navegar con teclado */
+  outline: 3px solid #598fc6;
+  outline-offset: 2px;
+}
+
+/* ===== Accesibilidad ===== */
+/* * Enlace "Saltar al contenido": aparece solo al enfocarlo con el teclado */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 2000;
+  padding: 0.6rem 1rem;
+  background: #3766a4;
+  color: #fff;
+  border-radius: 0 0 6px 6px;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* * Texto solo para lectores de pantalla */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,189 @@
+/* ========================================================================
+   contact.css — Sección "Contacto": formulario + mapa
+   Componente: src/components/Contact.astro
+   ======================================================================== */
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  background: var(--contact-bg);
+  padding: 5rem 2rem 3rem;
+  width: 100%;
+  transition: background-color 0.5s ease;
+}
+
+.contact__title {
+  font-size: 2rem;
+  color: var(--heading);
+  margin: 0 0 1rem;
+}
+
+/* ===== Cuadrícula: formulario a la izquierda, mapa a la derecha ===== */
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-gap: 2rem;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  align-items: stretch; /* * Ambas tarjetas tienen la misma altura */
+}
+
+/* * Tarjeta blanca (modo claro) o gris (modo oscuro), compartida por formulario y mapa */
+.contact__card {
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* ===== Formulario ===== */
+.contact__form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  text-align: left;
+}
+
+/* ? Espacio entre elementos con margin (y no "gap") por compatibilidad con iOS antiguos */
+.contact__form > * + * {
+  margin-top: 1rem;
+}
+
+.contact__form label {
+  font-weight: bold;
+  color: var(--label);
+}
+
+.contact__form label + input,
+.contact__form label + textarea {
+  margin-top: 0.4rem;
+}
+
+.contact__form input:not([type="hidden"]):not(.contact__trap),
+.contact__form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  /* ! No bajes de 16 px: con menos, Safari en iPhone hace zoom automático al tocar el campo */
+  font-size: 1rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.contact__form textarea {
+  resize: none;
+  height: 150px;
+}
+
+.contact__form button {
+  min-height: 44px; /* * Zona táctil cómoda */
+  background: var(--btn-bg);
+  color: #fff;
+  border: none;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact__form button:hover {
+  background: var(--btn-bg-hover);
+}
+
+/* * Mientras se envía, el botón se bloquea para evitar mensajes duplicados */
+.contact__form button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* ! Campo trampa contra bots: debe seguir fuera de la pantalla, pero NO usar display:none (los bots lo detectarían) */
+.contact__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* * Mensaje de estado ("Enviando…", éxito o error) */
+.contact__status {
+  min-height: 1.4em; /* ? Reserva el espacio para que el formulario no "salte" al aparecer el mensaje */
+  margin: 0;
+  text-align: center;
+}
+
+.contact__status[data-state="ok"] {
+  color: var(--ok);
+}
+
+.contact__status[data-state="error"] {
+  color: var(--error);
+}
+
+/* ===== Mapa ===== */
+.contact__map {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* * Recorta el mapa con las esquinas redondeadas de la tarjeta */
+  min-height: 380px;
+}
+
+.contact__map iframe {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 300px;
+  border: 0;
+  background: #e5e3df; /* * Color del mapa mientras carga */
+}
+
+.contact__map a {
+  padding: 0.85rem;
+  color: var(--label);
+  text-decoration: none;
+}
+
+.contact__map a:hover {
+  text-decoration: underline;
+}
+
+/* ? OpenStreetMap no tiene modo oscuro: se invierten los colores del mapa con un filtro */
+[data-theme="dark"] .contact__map iframe {
+  filter: invert(90%) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
+/* ===== Tablet y móvil: el mapa pasa debajo del formulario ===== */
+@media (max-width: 860px) {
+  .contact {
+    min-height: 0;
+    padding: 5rem 1rem 2.5rem;
+  }
+
+  .contact__grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 480px;
+  }
+
+  .contact__form {
+    padding: 1.5rem;
+  }
+
+  .contact__map {
+    min-height: 0;
+  }
+
+  .contact__map iframe {
+    flex: none;
+    height: 300px;
+    min-height: 0;
+  }
+}

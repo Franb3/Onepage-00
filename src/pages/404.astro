@@ -1,0 +1,35 @@
+---
+// ========================================================================
+// 404.astro — Página que se muestra cuando la dirección no existe
+// ------------------------------------------------------------------------
+// * Vercel la usa automáticamente para cualquier ruta inexistente.
+// * Estilos: src/styles/error-404.css
+// ========================================================================
+import "../styles/error-404.css";
+import { Picture } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import gradient from "../assets/gradient.webp";
+---
+
+<Layout title="Página no encontrada | Paraíso Nevado">
+  <main class="error-404">
+    {/* * Imagen de fondo (decorativa, por eso alt vacío) con tamaños adaptados a cada pantalla */}
+    <div class="error-404__bg" aria-hidden="true">
+      <Picture
+        src={gradient}
+        alt=""
+        widths={[640, 1280, 2400]}
+        sizes="100vw"
+        formats={["webp"]}
+        fallbackFormat="jpg"
+        quality={70}
+        loading="eager"
+      />
+    </div>
+    <div class="error-404__content">
+      <h1 class="error-404__title">¡Oops! Página no encontrada</h1>
+      <p class="error-404__text">Parece que la página que buscas no existe.</p>
+      <a href="/" class="error-404__btn">Volver al Inicio</a>
+    </div>
+  </main>
+</Layout>

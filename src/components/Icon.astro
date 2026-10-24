@@ -1,0 +1,59 @@
+---
+// ========================================================================
+// Icon.astro — Íconos SVG en línea (sin librerías ni CDN)
+// ------------------------------------------------------------------------
+// Uso:  <Icon name="coffee" size={32} />
+// * Hereda el color del texto (currentColor), así que se cambia con CSS "color".
+// ========================================================================
+import { brandIcons } from "../config/icons";
+
+interface Props {
+  name: string; // * Nombre del ícono (ver listas más abajo y config/icons.ts)
+  size?: number; // * Ancho y alto en píxeles (por defecto 24)
+  class?: string;
+}
+
+const { name, size = 24, class: className } = Astro.props;
+
+// * Íconos de interfaz y comidas: dibujados con trazo (estilo Feather / Lucide)
+// TODO: Para agregar uno nuevo, añade su contenido SVG (viewBox 24x24) con un nombre nuevo
+const ui: Record<string, string> = {
+  // Menú y navegación
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+  menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  "chevron-left": '<path d="M15 18l-6-6 6-6"/>',
+  "chevron-right": '<path d="M9 18l6-6-6-6"/>',
+  // Gastronomía
+  coffee:
+    '<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/>',
+  utensils:
+    '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  cookie:
+    '<path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/>',
+  wine: '<path d="M8 22h8"/><path d="M7 10h10"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+};
+
+// ? Primero se busca entre las marcas (redes sociales); si no está, entre los íconos de interfaz
+const brand = brandIcons[name];
+const body = brand ?? ui[name] ?? "";
+---
+
+{/* * Las marcas se rellenan (fill); los íconos de interfaz se dibujan con trazo (stroke) */}
+{/* ? aria-hidden: el ícono es decorativo; el texto o el aria-label del elemento que lo contiene ya describe la acción */}
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={brand ? "currentColor" : "none"}
+  stroke={brand ? undefined : "currentColor"}
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  set:html={body}
+/>

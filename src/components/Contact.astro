@@ -1,0 +1,150 @@
+---
+// ========================================================================
+// Contact.astro — Sección "Contacto": formulario de correo + mapa
+// ------------------------------------------------------------------------
+// * El formulario envía el mensaje al correo con FormSubmit (formsubmit.co):
+//   no hace falta cuenta, clave ni servidor propio.
+// * El mapa es de OpenStreetMap (tampoco necesita clave ni cuenta).
+// * Estilos: src/styles/contact.css
+// * Ubicación del mapa: src/config/site.ts (variable "location")
+// ! Requiere la variable de entorno PUBLIC_FORMSUBMIT_TARGET (ver .env).
+// ========================================================================
+import "../styles/contact.css";
+import { location, site } from "../config/site";
+
+// * Construye las direcciones del mapa a partir de las coordenadas
+const { lat, lng, area, name } = location;
+// ? bbox = rectángulo visible del mapa (oeste, sur, este, norte); toFixed(5) evita decimales largos
+const bbox = [lng - area, lat - area, lng + area, lat + area].map((n) => n.toFixed(5)).join("%2C");
+const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`;
+const mapLink = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=15/${lat}/${lng}`;
+
+// * Destino de los mensajes: el correo, o el "alias" que FormSubmit envía al confirmarlo
+// ? Se lee del archivo .env (local) o de las variables de entorno de Vercel
+// ? Es un dato público: queda visible en el HTML. Por eso conviene usar el alias
+const target = (import.meta.env.PUBLIC_FORMSUBMIT_TARGET ?? "").trim();
+const formAction = `https://formsubmit.co/${target}`; // * Envío normal (sin JavaScript)
+const ajaxAction = `https://formsubmit.co/ajax/${target}`; // * Envío sin recargar la página (con JavaScript)
+---
+
+<section id="contact" class="contact">
+  <h2 class="contact__title">Contacto</h2>
+
+  <div class="contact__grid">
+    {/* * Sin JavaScript el formulario también funciona: el navegador lo envía directo a FormSubmit */}
+    {/* * Con JavaScript, el script del final lo intercepta y muestra el resultado sin salir de la página */}
+    <form
+      id="contact-form"
+      class="contact__card contact__form"
+      action={formAction}
+      method="POST"
+      data-ajax={ajaxAction}
+      data-configured={target ? "true" : "false"}
+    >
+      {/* * Asunto del correo que recibirás */}
+      <input type="hidden" name="_subject" value={`Nuevo mensaje desde ${site.name}`} />
+      {/* * Formato del correo: una tabla ordenada con los datos */}
+      <input type="hidden" name="_template" value="table" />
+      {/* ! Campo trampa contra bots: las personas no lo ven. Si llega con texto, el mensaje se descarta. */}
+      {/* ? El nombre "_honey" es el que FormSubmit reconoce como trampa */}
+      <input type="text" name="_honey" class="contact__trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      {/* ? "autocomplete" e "inputmode" hacen que el móvil sugiera el nombre y muestre el teclado de correo */}
+      {/* * El campo "email" también sirve de "Responder a": al contestar el correo recibido, responde al visitante */}
+      <label for="name">Nombre:</label>
+      <input type="text" id="name" name="name" required maxlength="100" autocomplete="name" />
+
+      <label for="email">Correo:</label>
+      <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" inputmode="email" />
+
+      <label for="message">Mensaje:</label>
+      <textarea id="message" name="message" required maxlength="2000"></textarea>
+
+      <button type="submit">Enviar</button>
+      {/* * aria-live: los lectores de pantalla anuncian el resultado del envío automáticamente */}
+      <p id="form-status" class="contact__status" role="status" aria-live="polite" data-state="idle"></p>
+    </form>
+
+    {/* * Mapa: "sandbox" limita lo que puede hacer el contenido incrustado (más seguridad) */}
+    {/* ? loading="lazy": el mapa solo se descarga cuando la persona llega a esta sección */}
+    <div class="contact__card contact__map">
+      <iframe
+        src={mapSrc}
+        title={`Mapa con la ubicación de ${name}`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <a href={mapLink} target="_blank" rel="noopener noreferrer">Ver mapa más grande</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById("contact-form") as HTMLFormElement | null;
+  const statusEl = document.getElementById("form-status");
+
+  // ? Si el navegador es demasiado antiguo para "fetch", no se hace nada y se usa el envío normal del formulario
+  if (form && statusEl && "fetch" in window) {
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+    // * Muestra un mensaje bajo el botón. "state" cambia el color (verde = ok, rojo = error)
+    const setStatus = (state: "idle" | "sending" | "ok" | "error", text = "") => {
+      statusEl.textContent = text;
+      statusEl.setAttribute("data-state", state);
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      // ! Si falta el destino, no se intenta enviar (evita un error confuso)
+      if (form.dataset.configured !== "true") {
+        setStatus("error", "El formulario aún no está configurado.");
+        return;
+      }
+
+      // * Convierte los campos del formulario en un objeto simple
+      const data: Record<string, string> = {};
+      new FormData(form).forEach((value, key) => {
+        data[key] = String(value);
+      });
+
+      // ? Si el campo trampa trae texto, es un bot: se ignora en silencio
+      if (data._honey) return;
+
+      if (button) button.disabled = true;
+      setStatus("sending", "Enviando…");
+
+      // * Si el servidor no responde en 15 segundos, se cancela el envío
+      const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+      const timeout = window.setTimeout(() => controller?.abort(), 15000);
+
+      try {
+        const response = await fetch(form.dataset.ajax as string, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(data),
+          signal: controller?.signal,
+        });
+        const result = await response.json().catch(() => null);
+
+        // ? FormSubmit responde success como texto ("true") o como booleano: se aceptan ambos
+        const ok = response.ok && result && (result.success === true || result.success === "true");
+
+        if (ok) {
+          form.reset();
+          setStatus("ok", "¡Mensaje enviado! Te responderemos pronto.");
+        } else {
+          // ? Útil: la primera vez FormSubmit pide confirmar el correo y lo explica aquí
+          console.warn("FormSubmit:", result);
+          setStatus("error", "No se pudo enviar el mensaje. Inténtalo de nuevo más tarde.");
+        }
+      } catch {
+        // ? Cae aquí si no hay conexión o si se agotó el tiempo
+        setStatus("error", "Sin conexión o tiempo agotado. Inténtalo de nuevo.");
+      } finally {
+        window.clearTimeout(timeout);
+        if (button) button.disabled = false;
+      }
+    });
+  }
+</script>

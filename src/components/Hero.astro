@@ -1,0 +1,131 @@
+---
+// ========================================================================
+// Hero.astro — Carrusel de portada a pantalla completa
+// ------------------------------------------------------------------------
+// * Se desliza con el dedo en el móvil, tiene flechas y cambia solo cada 5 s.
+// * Estilos: src/styles/hero.css
+// TODO: Para cambiar las fotos, reemplaza los archivos de src/assets/hero/
+//       o agrega nuevas importaciones y súmalas a "slides".
+// ========================================================================
+import "../styles/hero.css";
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import mountain1 from "../assets/hero/mountain1.webp";
+import mountain2 from "../assets/hero/mountain2.webp";
+import mountain3 from "../assets/hero/mountain3.webp";
+
+// * Imágenes del carrusel y su texto alternativo (lo leen los lectores de pantalla)
+const slides = [
+  { src: mountain1, alt: "Montañas cubiertas de nieve, vista 1" },
+  { src: mountain2, alt: "Montañas cubiertas de nieve, vista 2" },
+  { src: mountain3, alt: "Montañas cubiertas de nieve, vista 3" },
+];
+---
+
+<section id="header" class="hero" aria-roledescription="carrusel" aria-label="Imágenes de Paraíso Nevado">
+  <div class="hero__track" id="hero-track">
+    {slides.map((slide, i) => (
+      <div
+        class="hero__slide"
+        role="group"
+        aria-roledescription="diapositiva"
+        aria-label={`${i + 1} de ${slides.length}`}
+      >
+        {/* * widths + sizes: el navegador elige el tamaño justo para su pantalla (un móvil descarga menos) */}
+        {/* * WebP para navegadores modernos y JPG de respaldo para iPhone con iOS 13 o anterior */}
+        {/* ? Solo la primera imagen carga de inmediato y con prioridad; las otras esperan (lazy) */}
+        <Picture
+          src={slide.src}
+          alt={slide.alt}
+          widths={[640, 960, 1440, 1920, 2400]}
+          sizes="100vw"
+          formats={["webp"]}
+          fallbackFormat="jpg"
+          quality={72}
+          loading={i === 0 ? "eager" : "lazy"}
+          fetchpriority={i === 0 ? "high" : undefined}
+          decoding="async"
+        />
+      </div>
+    ))}
+  </div>
+
+  <button class="hero__btn hero__btn--prev" id="hero-prev" type="button" aria-label="Imagen anterior">
+    <Icon name="chevron-left" size={22} />
+  </button>
+  <button class="hero__btn hero__btn--next" id="hero-next" type="button" aria-label="Imagen siguiente">
+    <Icon name="chevron-right" size={22} />
+  </button>
+</section>
+
+<script>
+  const track = document.getElementById("hero-track");
+  const prev = document.getElementById("hero-prev");
+  const next = document.getElementById("hero-next");
+
+  if (track && prev && next) {
+    const total = track.children.length;
+    const INTERVAL = 5000; // * Milisegundos entre cada cambio automático
+    let index = 0; // * Posición de la imagen visible (0 = primera)
+    let paused = false;
+    let resumeTimer: number | undefined;
+    let scrollTimer: number | undefined;
+
+    // * Mueve el carrusel a una imagen. Si se pasa del final vuelve al inicio (y viceversa)
+    const goTo = (target: number, smooth = true) => {
+      index = (target + total) % total;
+      const left = index * track.clientWidth;
+      // ? Los navegadores muy antiguos no entienden scrollTo con opciones: se usa scrollLeft directo
+      if (typeof track.scrollTo === "function") {
+        track.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+      } else {
+        track.scrollLeft = left;
+      }
+    };
+
+    // * Si la persona desliza con el dedo, se recalcula en qué imagen quedó
+    track.addEventListener(
+      "scroll",
+      () => {
+        window.clearTimeout(scrollTimer);
+        scrollTimer = window.setTimeout(() => {
+          index = Math.round(track.scrollLeft / track.clientWidth) || 0;
+        }, 80);
+      },
+      { passive: true },
+    );
+
+    // * Pausa el cambio automático un rato cuando la persona interactúa (para no quitarle la imagen mientras mira)
+    const hold = (ms: number) => {
+      paused = true;
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => (paused = false), ms);
+    };
+
+    prev.addEventListener("click", () => {
+      hold(8000);
+      goTo(index - 1);
+    });
+    next.addEventListener("click", () => {
+      hold(8000);
+      goTo(index + 1);
+    });
+    track.addEventListener("pointerdown", () => hold(8000));
+    track.addEventListener("touchstart", () => hold(8000), { passive: true });
+
+    // * Al girar el teléfono o cambiar el tamaño de la ventana, se realinea la imagen visible
+    window.addEventListener("resize", () => goTo(index, false));
+
+    // ! El cambio automático se desactiva si la persona pidió "reducir movimiento" en su sistema
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion) {
+      window.setInterval(() => {
+        // ? No avanza si hay una pausa activa o si la pestaña no está a la vista (ahorra batería)
+        if (paused || document.hidden) return;
+        const target = index + 1;
+        // * Al volver de la última a la primera el salto es instantáneo (no recorre todo el carrusel)
+        goTo(target, target < total);
+      }, INTERVAL);
+    }
+  }
+</script>

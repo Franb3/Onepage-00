@@ -1,0 +1,32 @@
+---
+// ========================================================================
+// Meals.astro — Sección "Gastronomía": desayuno, almuerzo, merienda y cena
+// ------------------------------------------------------------------------
+// * Cada comida es una tarjeta con ícono, horario y descripción.
+// * Los datos (títulos, horarios, textos e íconos) se editan en
+// * src/config/site.ts, variables "mealsSection" y "meals".
+// * Estilos: src/styles/meals.css
+// TODO: Para agregar otra comida, añade un objeto a "meals" en site.ts
+// ========================================================================
+import "../styles/meals.css";
+import Icon from "./Icon.astro";
+import { meals, mealsSection } from "../config/site";
+---
+
+{/* ? aria-labelledby enlaza la sección con su título para que los lectores de pantalla la anuncien por su nombre */}
+<section id="meals" class="meals" aria-labelledby="meals-title">
+  <h2 class="meals__title" id="meals-title">{mealsSection.title}</h2>
+  <p class="meals__intro">{mealsSection.intro}</p>
+
+  <ul class="meals__grid">
+    {meals.map((meal) => (
+      <li class="meals__card">
+        {/* * Círculo con el ícono de la comida */}
+        <span class="meals__icon"><Icon name={meal.icon} size={32} /></span>
+        <h3 class="meals__name">{meal.title}</h3>
+        <p class="meals__time"><Icon name="clock" size={16} />{meal.time}</p>
+        <p class="meals__text">{meal.description}</p>
+      </li>
+    ))}
+  </ul>
+</section>

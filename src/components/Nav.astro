@@ -1,0 +1,124 @@
+---
+// ========================================================================
+// Nav.astro — Menú de navegación fijo
+// ------------------------------------------------------------------------
+// * Incluye: logo, enlaces a las secciones, botón de modo oscuro y menú
+// * tipo hamburguesa para móviles.
+// * Estilos: src/styles/nav.css
+// * Enlaces: se editan en src/config/site.ts (variable "nav")
+// ========================================================================
+import "../styles/nav.css";
+import { Picture } from "astro:assets";
+import logo from "../assets/logo.png";
+import Icon from "./Icon.astro";
+import { nav, site } from "../config/site";
+---
+
+<nav class="nav" id="nav" aria-label="Principal">
+  <div class="nav__bar">
+    {/* * Logo: Astro genera varios tamaños (100 y 200 px) en WebP, con PNG de respaldo para iOS antiguos */}
+    <a class="nav__logo" href="#header" aria-label={`${site.name}, ir al inicio`}>
+      <Picture
+        src={logo}
+        alt=""
+        widths={[100, 200]}
+        sizes="67px"
+        formats={["webp"]}
+        fallbackFormat="png"
+        loading="eager"
+        decoding="async"
+      />
+    </a>
+
+    {/* * Botón hamburguesa: solo visible en móvil y solo si hay JavaScript (ver nav.css) */}
+    {/* ? aria-expanded y aria-label los actualiza el script de abajo para lectores de pantalla */}
+    <button
+      class="nav__toggle"
+      id="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+      aria-label="Abrir menú"
+    >
+      <span class="nav__toggle-open"><Icon name="menu" size={28} /></span>
+      <span class="nav__toggle-close"><Icon name="close" size={28} /></span>
+    </button>
+
+    <ul class="nav__list" id="nav-menu">
+      {nav.map((item) => (
+        <li><a href={item.href}>{item.label}</a></li>
+      ))}
+      <li>
+        {/* * Botón de modo oscuro: la luna se ve en modo claro y el sol en modo oscuro */}
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Activar modo oscuro"
+        >
+          <span class="theme-toggle__moon"><Icon name="moon" size={22} /></span>
+          <span class="theme-toggle__sun"><Icon name="sun" size={22} /></span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById("nav");
+  const toggle = document.getElementById("nav-toggle");
+  const menu = document.getElementById("nav-menu");
+
+  // ===== Menú móvil =====
+  if (nav && toggle && menu) {
+    // * Abre o cierra el menú y mantiene actualizados los atributos de accesibilidad
+    const setOpen = (open: boolean) => {
+      menu.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    };
+
+    toggle.addEventListener("click", () => setOpen(!menu.classList.contains("is-open")));
+
+    // * Al elegir un enlace, el menú se cierra solo
+    menu.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setOpen(false);
+    });
+
+    // * También se cierra al tocar fuera del menú o al pulsar Escape
+    document.addEventListener("click", (event) => {
+      if (!nav.contains(event.target as Node)) setOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+  }
+
+  // ===== Modo oscuro =====
+  const themeButton = document.getElementById("theme-toggle");
+  const root = document.documentElement;
+
+  if (themeButton) {
+    // * Actualiza el estado y la descripción del botón según el tema actual
+    const sync = () => {
+      const dark = root.getAttribute("data-theme") === "dark";
+      themeButton.setAttribute("aria-pressed", String(dark));
+      themeButton.setAttribute("aria-label", dark ? "Activar modo claro" : "Activar modo oscuro");
+    };
+
+    themeButton.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      // ! El tema inicial lo fija el script de Layout.astro antes de pintar la página; aquí solo se cambia
+      root.setAttribute("data-theme", next);
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        // ? El almacenamiento puede estar bloqueado (modo privado): el tema cambia igual, solo que no se recuerda
+      }
+      sync();
+    });
+
+    sync();
+  }
+</script>
